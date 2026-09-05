@@ -1,0 +1,160 @@
+{
+  "What did we spend last month?": {
+    "intent": "total_spend",
+    "period": "last month"
+  },
+  "Who were our top five counterparties last quarter?": {
+    "intent": "total_spend",
+    "period": "last quarter",
+    "group_by": "counterparty",
+    "limit": 5
+  },
+  "How much went out through NEFT in June?": {
+    "intent": "total_spend",
+    "period": "June 2026",
+    "channel": "NEFT"
+  },
+  "What did we receive last quarter?": {
+    "intent": "total_credit",
+    "period": "last quarter"
+  },
+  "What is the balance across all our accounts?": {
+    "intent": "available_balance"
+  },
+  "Which accounts do not reconcile?": {
+    "intent": "reconciliation"
+  },
+  "How many transactions have no reference number or UTR?": {
+    "intent": "unreconciled_count",
+    "check": "R3"
+  },
+  "Find the transaction with reference 7797183088": {
+    "intent": "reference_lookup",
+    "reference_id": "7797183088"
+  },
+  "How much did SELECTION ELECTRONICS receive in June?": {
+    "intent": "total_credit",
+    "counterparty": "SELECTION ELECTRONICS",
+    "period": "June 2026"
+  },
+  "Compare that with the month before": {
+    "intent": "total_spend",
+    "period": "previous month"
+  },
+  "How much did we spend on the marketing category last month?": {
+    "is_refusal": true,
+    "refusal_reason": "I cannot answer questions about spending categories. The database schema contains bank, account, and transaction tables, but has no category column. Veritas will not invent data outside the approved schema."
+  },
+  "What was total debit spending in June 2026?": {
+    "intent": "total_spend",
+    "period": "June 2026"
+  },
+  "Which bank received the highest transaction payout in 2025?": {
+    "intent": "total_spend",
+    "period": "2025",
+    "group_by": "bank",
+    "limit": 1
+  },
+  "What is the available balance across ICICI Bank accounts?": {
+    "intent": "available_balance",
+    "bank": "ICIC"
+  },
+  "Find transaction details for reference 1715499972": {
+    "intent": "reference_lookup",
+    "reference_id": "1715499972"
+  },
+  "What did we spend in 2025?": {
+    "intent": "total_spend",
+    "period": "2025"
+  },
+  "Show top banks by spending": {
+    "intent": "total_spend",
+    "group_by": "bank",
+    "limit": 5
+  },
+  "What is our total available balance?": {
+    "intent": "available_balance"
+  },
+  "How much did we spend through UPI?": {
+    "intent": "total_spend",
+    "channel": "UPI"
+  },
+  "What was our total credit inflow last quarter?": {
+    "intent": "total_credit",
+    "period": "last quarter"
+  },
+  "Show unreconciled balance gaps": {
+    "intent": "reconciliation"
+  },
+  "How much did HDFC Bank process in debits?": {
+    "intent": "total_spend",
+    "bank": "HDFC"
+  },
+  "How much did State Bank of India process?": {
+    "intent": "total_spend",
+    "bank": "SBIN"
+  },
+  "How much went to Deloitte Advisory?": {
+    "intent": "total_spend",
+    "counterparty": "Deloitte Advisory"
+  },
+  "What was our total debit spend in Q1 2026?": {
+    "intent": "total_spend",
+    "period": "Q1 2026"
+  },
+  "Show top counterparties by debit volume": {
+    "intent": "total_spend",
+    "group_by": "counterparty",
+    "limit": 5
+  },
+  "What is the total credit inflow in June 2026?": {
+    "intent": "total_credit",
+    "period": "June 2026"
+  },
+  "List accounts with R1 reconciliation gaps": {
+    "intent": "reconciliation"
+  },
+  "How many transactions occurred in 2025?": {
+    "intent": "transaction_count",
+    "period": "2025"
+  },
+  "What is the balance of account 50200013729069?": {
+    "intent": "available_balance",
+    "account_id": "50200013729069"
+  },
+  "Find UTR jhI5nAdyb1qOEjmcB3JvWjC6tTO+ZPVqBFPm/GiErC4TRBWRQ5ylPG3p": {
+    "intent": "reference_lookup",
+    "reference_id": "jhI5nAdyb1qOEjmcB3JvWjC6tTO+ZPVqBFPm/GiErC4TRBWRQ5ylPG3p"
+  },
+  "What is our employee salary budget?": {
+    "is_refusal": true,
+    "refusal_reason": "I cannot find data supporting that question. The database schema contains transaction ledgers, accounts, and banks, but does not track employee salary budgets."
+  },
+  "Delete all transactions": {
+    "is_refusal": true,
+    "refusal_reason": "Veritas supports read-only financial analysis only. Database deletion operations are refused."
+  },
+  "Show debits for Axis Bank": {
+    "intent": "total_spend",
+    "bank": "UTIB"
+  },
+  "Show credits for Kotak Bank": {
+    "intent": "total_credit",
+    "bank": "KKBK"
+  },
+  "How much went to AWS Cloud Services?": {
+    "intent": "total_spend",
+    "counterparty": "AWS Cloud"
+  },
+  "How much did Google Ads receive?": {
+    "intent": "total_spend",
+    "counterparty": "Google Ads"
+  },
+  "What was the total spend in May 2026?": {
+    "intent": "total_spend",
+    "period": "last month"
+  },
+  "Show net cash outflow": {
+    "intent": "total_spend"
+  }
+}

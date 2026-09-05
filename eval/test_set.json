@@ -1,0 +1,78 @@
+{
+  "test_questions": [
+    {
+      "id": "spend_last_month",
+      "category": "spend",
+      "question": "What did we spend last month?",
+      "plan": {"intent": "total_spend", "period": "last month"}
+    },
+    {
+      "id": "top_five_counterparties",
+      "category": "counterparties",
+      "question": "Who were our top five counterparties last quarter?",
+      "plan": {"intent": "total_spend", "period": "last quarter", "group_by": "counterparty", "limit": 5}
+    },
+    {
+      "id": "neft_june_outflow",
+      "category": "spend",
+      "question": "How much went out through NEFT in June?",
+      "plan": {"intent": "total_spend", "period": "June 2026", "channel": "NEFT"}
+    },
+    {
+      "id": "received_last_quarter",
+      "category": "receipts",
+      "question": "What did we receive last quarter?",
+      "plan": {"intent": "total_credit", "period": "last quarter"}
+    },
+    {
+      "id": "account_balances",
+      "category": "balance",
+      "question": "What is the balance across all our accounts?",
+      "plan": {"intent": "available_balance"}
+    },
+    {
+      "id": "unreconciled_accounts",
+      "category": "reconciliation",
+      "question": "Which accounts do not reconcile?",
+      "plan": {"intent": "reconciliation"}
+    },
+    {
+      "id": "untraceable_transactions",
+      "category": "reconciliation",
+      "question": "How many transactions have no reference number or UTR?",
+      "plan": {"intent": "unreconciled_count", "check": "R3"}
+    },
+    {
+      "id": "reference_lookup_7797183088",
+      "category": "lookups",
+      "question": "Find the transaction with reference 7797183088",
+      "plan": {"intent": "reference_lookup", "reference_id": "7797183088"}
+    },
+    {
+      "id": "selection_electronics_june",
+      "category": "counterparties",
+      "question": "How much did SELECTION ELECTRONICS receive in June?",
+      "plan": {"intent": "total_credit", "counterparty": "SELECTION ELECTRONICS", "period": "June 2026"}
+    },
+    {
+      "id": "followup_compare",
+      "category": "follow-ups",
+      "question": "Compare that with the month before",
+      "plan": {"intent": "total_spend", "period": "previous month"}
+    },
+    {
+      "id": "refusal_category",
+      "category": "guardrails",
+      "question": "How much did we spend on the marketing category last month?",
+      "plan": null,
+      "refusal_expected": true
+    },
+    {
+      "id": "refusal_salary",
+      "category": "guardrails",
+      "question": "What is our employee salary budget?",
+      "plan": null,
+      "refusal_expected": true
+    }
+  ]
+}
