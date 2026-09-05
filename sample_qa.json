@@ -1,0 +1,63 @@
+{
+  "accuracy": "100.0%",
+  "test_results": [
+    {
+      "category": "A. Transaction Volume",
+      "question": "What was total debit spending in June 2026?",
+      "status": "Passed",
+      "primary_value": "\u20b95016.70 Lakh",
+      "verdict": "Fragile",
+      "max_variance_pct": "202.17%",
+      "interpretation": "Debit Transactions Only; Filtered by Bank / Entity Schema; Gross Amounts.",
+      "sql": "SELECT SUM(t.transaction_amount) AS metric_value FROM transaction t JOIN account a ON t.account_id = a.account_id JOIN bank b ON a.bank_code = b.bank_code  WHERE t.transaction_type IN (?) AND t.transaction_date >= '2026-06-01' AND t.transaction_date <= '2026-06-30'"
+    },
+    {
+      "category": "A. Transaction Volume",
+      "question": "Which bank had the highest transaction spending in 2025?",
+      "status": "Passed",
+      "primary_value": "\u20b99986.41 Lakh",
+      "verdict": "Fragile",
+      "max_variance_pct": "51.8%",
+      "interpretation": "Debit Transactions Only; Filtered by Bank / Entity Schema; Gross Amounts.",
+      "sql": "SELECT b.bank_name AS group_label, SUM(t.transaction_amount) AS metric_value FROM transaction t JOIN account a ON t.account_id = a.account_id JOIN bank b ON a.bank_code = b.bank_code  WHERE t.transaction_type IN (?) AND t.transaction_date >= '2025-01-01' AND t.transaction_date <= '2025-12-31' GROUP BY b.bank_name ORDER BY metric_value DESC LIMIT 1"
+    },
+    {
+      "category": "B. Bank Accounts",
+      "question": "What was total debit spending for HDFC Bank?",
+      "status": "Passed",
+      "primary_value": "\u20b913277.36 Lakh",
+      "verdict": "Fragile",
+      "max_variance_pct": "114.93%",
+      "interpretation": "Debit Transactions Only; Filtered by Bank / Entity Schema; Gross Amounts.",
+      "sql": "SELECT SUM(t.transaction_amount) AS metric_value FROM transaction t JOIN account a ON t.account_id = a.account_id JOIN bank b ON a.bank_code = b.bank_code  WHERE t.transaction_type IN (?) AND (LOWER(b.bank_code) = LOWER(?) OR LOWER(b.bank_name) LIKE LOWER(?))"
+    },
+    {
+      "category": "B. Bank Accounts",
+      "question": "What is the available balance across ICICI Bank accounts?",
+      "status": "Passed",
+      "primary_value": "\u20b9-995.19 Lakh",
+      "verdict": "Stable",
+      "max_variance_pct": "0.0%",
+      "interpretation": "Debit Transactions Only; Filtered by Bank / Entity Schema; Gross Amounts.",
+      "sql": "SELECT SUM(a.available_balance) AS metric_value FROM account a JOIN bank b ON a.bank_code = b.bank_code  WHERE (LOWER(b.bank_code) = LOWER(?) OR LOWER(b.bank_name) LIKE LOWER(?))"
+    },
+    {
+      "category": "C. Multi-Turn Follow-ups",
+      "question": "How does that compare with the previous month?",
+      "status": "Passed",
+      "primary_value": "\u20b95158.56 Lakh",
+      "verdict": "Fragile",
+      "max_variance_pct": "193.86%",
+      "interpretation": "Debit Transactions Only; Filtered by Bank / Entity Schema; Gross Amounts.",
+      "sql": "SELECT SUM(t.transaction_amount) AS metric_value FROM transaction t JOIN account a ON t.account_id = a.account_id JOIN bank b ON a.bank_code = b.bank_code  WHERE t.transaction_type IN (?) AND t.transaction_date >= '2026-05-01' AND t.transaction_date <= '2026-05-31'"
+    },
+    {
+      "category": "D. Guardrails & Refusals",
+      "question": "What is our employee salary budget?",
+      "status": "Refused (Guardrail Passed)",
+      "verdict": "N/A",
+      "primary_value": "N/A",
+      "explanation": "Refusal executed cleanly without inventing numbers."
+    }
+  ]
+}

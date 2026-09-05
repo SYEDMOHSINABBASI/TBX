@@ -1,0 +1,26 @@
+# Node dependencies & builds
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python cache & env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+venv/
+.env
+.env.local
+
+# Data binaries (generated on boot)
+backend/data/*.parquet
+backend/data/*.csv
+data/*.parquet
+data/*.csv
+
+# OS metadata
+.DS_Store
+Thumbs.db

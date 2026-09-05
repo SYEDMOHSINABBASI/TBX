@@ -1,0 +1,46 @@
+{
+  "dataset_paths": {
+    "bank": "data/bank.parquet",
+    "account": "data/account.parquet",
+    "transaction": "data/transaction.parquet"
+  },
+  "tables": {
+    "bank": "bank",
+    "account": "account",
+    "transaction": "transaction"
+  },
+  "columns": {
+    "bank": {
+      "bank_code": "bank_code",
+      "bank_name": "bank_name"
+    },
+    "account": {
+      "account_id": "account_id",
+      "entity_id": "entity_id",
+      "account_number": "account_number",
+      "program_id": "program_id",
+      "available_balance": "available_balance",
+      "bank_code": "bank_code"
+    },
+    "transaction": {
+      "transaction_id": "transaction_id",
+      "account_id": "account_id",
+      "transaction_date": "transaction_date",
+      "transaction_type": "transaction_type",
+      "description": "description",
+      "transaction_amount": "transaction_amount",
+      "transaction_reference_id": "transaction_reference_id",
+      "utr_number": "utr_number"
+    }
+  },
+  "default_interpretations": {
+    "type_inclusion": ["debit"],
+    "date_basis": "transaction_date",
+    "reference_field": "transaction_reference_id"
+  },
+  "verdict_thresholds": {
+    "stable_max_pct": 5.0,
+    "sensitive_max_pct": 15.0,
+    "materiality_min_amount": 1000.0
+  }
+}
