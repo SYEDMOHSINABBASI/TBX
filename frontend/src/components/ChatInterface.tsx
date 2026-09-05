@@ -1,54 +1,67 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, RefreshCw, Cpu, Database, HelpCircle, ArrowRight } from 'lucide-react';
+import { Send, Bot, User, Sparkles, RefreshCw, Cpu, Database, HelpCircle, ArrowRight, Shield, Layers, TrendingUp } from 'lucide-react';
 import { ChatMessage } from '@/lib/types';
 import { TruthPanel } from './TruthPanel';
 import { ModelBenchmarkModal } from './ModelBenchmarkModal';
+import { Sidebar } from './Sidebar';
 
-const SUGGESTED_QUESTIONS = [
-  "Which vendor received the highest payout last quarter?",
-  "How much did we spend on marketing last month?",
-  "How does that compare with the previous month?",
-  "How many transactions remain unreconciled?",
-  "Show me total spend by category in Q4 2025",
-  "What is our employee salary budget?"
+const PROMPT_CARDS = [
+  {
+    title: "Bank Payout Ranking",
+    subtitle: "Which bank received the highest transaction payout in 2025?",
+    icon: TrendingUp,
+    query: "Which bank received the highest transaction payout in 2025?"
+  },
+  {
+    title: "Date Sensitivity Analysis",
+    subtitle: "What was total debit spending in June 2026?",
+    icon: Layers,
+    query: "What was total debit spending in June 2026?"
+  },
+  {
+    title: "Account Balance Check",
+    subtitle: "What is the available balance across ICICI Bank accounts?",
+    icon: Database,
+    query: "What is the available balance across ICICI Bank accounts?"
+  },
+  {
+    title: "Reference Number Search",
+    subtitle: "Find transaction details for reference 1715499972",
+    icon: Shield,
+    query: "Find transaction details for reference 1715499972"
+  }
 ];
 
 export const ChatInterface: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome-1',
-      role: 'assistant',
-      content: "Hello! I am TBX Truth Engine. Ask any question about spend, vendor payouts, or reconciliation items. I will compute the exact primary number from DuckDB and verify whether alternative interpretations (like transaction vs. settlement date) materially change the answer.",
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [isBenchmarkOpen, setIsBenchmarkOpen] = useState<boolean>(false);
-  const [dbStatus, setDbStatus] = useState<{ loaded: boolean; records: number }>({ loaded: false, records: 0 });
+  const [recordCount, setRecordCount] = useState<number>(100000);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fetch backend status
     fetch('/api/schema')
       .then(res => res.json())
       .then(data => {
-        if (data.total_records) {
-          setDbStatus({ loaded: true, records: data.total_records });
+        if (data.total_transactions) {
+          setRecordCount(data.total_transactions);
         }
       })
-      .catch(() => {
-        setDbStatus({ loaded: false, records: 100000 });
-      });
+      .catch(() => setRecordCount(100000));
   }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setInput('');
+  };
 
   const handleSend = async (queryText?: string) => {
     const textToSend = queryText || input;
@@ -110,156 +123,190 @@ export const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-slate-100 max-w-7xl mx-auto border-x border-surface-border/50 shadow-2xl">
-      {/* Navbar Header */}
-      <header className="px-6 py-4 border-b border-surface-border glass-panel flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20 text-white font-bold">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-extrabold tracking-tight text-white">TBX Truth Engine</h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                BVP Catalyst Hackathon
-              </span>
+    <div className="flex h-screen bg-[#07090e] text-slate-100 overflow-hidden font-sans">
+      {/* Lyzr Sidebar */}
+      <Sidebar
+        onNewChat={handleNewChat}
+        onOpenBenchmark={() => setIsBenchmarkOpen(true)}
+        recordCount={recordCount}
+      />
+
+      {/* Main Studio Canvas */}
+      <div className="flex-1 flex flex-col h-full min-w-0 bg-[#090c15]">
+        {/* Top Floating Glass Header */}
+        <header className="px-6 py-4 border-b border-white/5 lyzr-glass flex items-center justify-between shrink-0 z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+              <Sparkles className="w-5 h-5" />
             </div>
-            <p className="text-xs text-slate-400">Financial Intelligence System with Interpretation Stability Verification</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface border border-surface-border text-xs text-slate-300">
-            <Database className="w-3.5 h-3.5 text-emerald-400" />
-            <span>DuckDB: <strong className="text-white">100,000</strong> Records</span>
-          </div>
-
-          <button
-            onClick={() => setIsBenchmarkOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold transition-all shadow-sm"
-          >
-            <Cpu className="w-4 h-4 text-blue-400" />
-            <span>Model Benchmark</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Chat Canvas */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        {messages.map(msg => (
-          <div key={msg.id} className={`flex gap-3 sm:gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="p-2 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 shrink-0 h-fit mt-1">
-                <Bot className="w-5 h-5" />
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-extrabold text-white tracking-tight">TBX Truth Engine</h1>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  Lyzr Studio AI
+                </span>
               </div>
-            )}
+              <p className="text-xs text-slate-400">Deterministic Financial Intelligence with Interpretation Stability</p>
+            </div>
+          </div>
 
-            <div className={`max-w-3xl space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-              <div
-                className={`p-4 rounded-2xl text-sm leading-relaxed ${
-                  msg.role === 'user'
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 rounded-tr-none'
-                    : 'glass-panel text-slate-200 border border-surface-border rounded-tl-none'
-                }`}
-              >
-                <div>{msg.content}</div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsBenchmarkOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-xs font-semibold transition-all shadow-sm"
+            >
+              <Cpu className="w-4 h-4 text-cyan-400" />
+              <span>Qwen 2.5 8B (&lt;20B Cap)</span>
+            </button>
+          </div>
+        </header>
 
-                {/* Clarification Options */}
-                {msg.is_clarification && msg.clarification_options && (
-                  <div className="mt-3 space-y-2 pt-2 border-t border-white/10">
-                    <div className="text-xs font-semibold text-slate-300">Suggested Clarifications:</div>
-                    <div className="flex flex-wrap gap-2">
-                      {msg.clarification_options.map((opt, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleSend(opt)}
-                          className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-border text-xs text-blue-300 border border-blue-500/30 transition-all"
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+        {/* Scrollable Conversation Workspace */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6">
+          {/* Welcome Hero Screen when message list is empty */}
+          {messages.length === 0 && (
+            <div className="max-w-4xl mx-auto space-y-8 pt-8 pb-12">
+              <div className="text-center space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  BVP Catalyst Hackathon Innovation
+                </div>
+
+                <h2 className="text-3xl sm:text-5xl font-extrabold text-gradient-purple tracking-tight">
+                  Verify Truth Beyond Assumptions
+                </h2>
+
+                <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+                  Ask financial questions over <strong className="text-slate-200 font-semibold">100,000 records</strong> across bank, account, and transaction schemas. Deterministically verified via DuckDB.
+                </p>
               </div>
 
-              {/* Truth Panel Render */}
-              {msg.result_package && (
-                <TruthPanel pkg={msg.result_package} />
+              {/* 4 Prompt Grid Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {PROMPT_CARDS.map((card, idx) => {
+                  const IconComp = card.icon;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleSend(card.query)}
+                      className="p-5 rounded-2xl lyzr-card border border-white/5 text-left flex items-start gap-4 transition-all lyzr-card-hover group"
+                    >
+                      <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:bg-cyan-500/20 transition-all shrink-0">
+                        <IconComp className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors flex items-center gap-1.5">
+                          {card.title}
+                          <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </div>
+                        <div className="text-xs text-slate-400 leading-relaxed">
+                          {card.subtitle}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Active Message Thread */}
+          {messages.map(msg => (
+            <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {msg.role === 'assistant' && (
+                <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-violet-500/20 border border-cyan-500/30 text-cyan-300 shrink-0 h-fit mt-1">
+                  <Bot className="w-5 h-5" />
+                </div>
               )}
 
-              <div className="text-[10px] text-slate-500 px-1">
-                {msg.timestamp}
+              <div className={`max-w-3xl space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                <div
+                  className={`p-4 sm:p-5 rounded-2xl text-sm leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-lg shadow-cyan-500/10 rounded-tr-none font-medium'
+                      : 'lyzr-card text-slate-200 border border-white/10 rounded-tl-none'
+                  }`}
+                >
+                  <div>{msg.content}</div>
+
+                  {msg.is_clarification && msg.clarification_options && (
+                    <div className="mt-4 space-y-2 pt-3 border-t border-white/10">
+                      <div className="text-xs font-semibold text-cyan-300">Suggested Clarifications:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {msg.clarification_options.map((opt, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSend(opt)}
+                            className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-cyan-300 border border-cyan-500/30 transition-all font-medium"
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {msg.result_package && (
+                  <TruthPanel pkg={msg.result_package} />
+                )}
+
+                <div className="text-[10px] text-slate-500 px-1 font-mono">
+                  {msg.timestamp}
+                </div>
               </div>
+
+              {msg.role === 'user' && (
+                <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 shrink-0 h-fit mt-1">
+                  <User className="w-5 h-5" />
+                </div>
+              )}
             </div>
+          ))}
 
-            {msg.role === 'user' && (
-              <div className="p-2 rounded-xl bg-surface-border text-slate-300 shrink-0 h-fit mt-1">
-                <User className="w-5 h-5" />
-              </div>
-            )}
-          </div>
-        ))}
+          {loading && (
+            <div className="flex gap-3 items-center text-slate-300 text-xs p-4 lyzr-card rounded-2xl w-fit border border-cyan-500/30">
+              <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+              <span>Querying DuckDB analytical engine &amp; computing stability matrix...</span>
+            </div>
+          )}
 
-        {loading && (
-          <div className="flex gap-3 items-center text-slate-400 text-xs italic p-4 glass-panel rounded-2xl w-fit">
-            <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
-            <span>Understanding language &amp; querying DuckDB analytical engine...</span>
-          </div>
-        )}
+          <div ref={messagesEndRef} />
+        </main>
 
-        <div ref={messagesEndRef} />
-      </main>
-
-      {/* Suggested Questions Pill Row */}
-      <div className="px-6 py-2 border-t border-surface-border/40 bg-surface/30 flex items-center gap-2 overflow-x-auto text-xs shrink-0">
-        <span className="text-slate-400 text-[11px] font-semibold whitespace-nowrap flex items-center gap-1">
-          <HelpCircle className="w-3.5 h-3.5 text-blue-400" />
-          Suggested:
-        </span>
-        {SUGGESTED_QUESTIONS.map((q, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSend(q)}
-            className="px-3 py-1 rounded-full bg-surface-border/40 hover:bg-surface-border text-slate-300 hover:text-white border border-white/5 transition-all whitespace-nowrap shrink-0 text-[11px]"
+        {/* Lyzr Floating Glass Input Footer */}
+        <footer className="p-4 sm:p-6 border-t border-white/5 lyzr-glass shrink-0">
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              handleSend();
+            }}
+            className="max-w-4xl mx-auto flex items-center gap-3 bg-[#0d101b] p-2 rounded-2xl border border-white/10 focus-within:border-cyan-500/50 transition-all shadow-2xl"
           >
-            {q}
-          </button>
-        ))}
+            <input
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              placeholder="Ask a financial question (e.g. 'Which bank received the highest payout in 2025?')..."
+              className="flex-1 bg-transparent px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none"
+            />
+
+            <button
+              type="submit"
+              disabled={!input.trim() || loading}
+              className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 text-white shadow-lg shadow-cyan-500/20 transition-all shrink-0 font-semibold"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
+        </footer>
+
+        {/* Model Benchmark Modal */}
+        <ModelBenchmarkModal
+          isOpen={isBenchmarkOpen}
+          onClose={() => setIsBenchmarkOpen(false)}
+        />
       </div>
-
-      {/* Chat Input Bar */}
-      <footer className="p-4 border-t border-surface-border glass-panel shrink-0">
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            handleSend();
-          }}
-          className="flex items-center gap-3 bg-surface p-2 rounded-xl border border-surface-border focus-within:border-blue-500/50 transition-all shadow-inner"
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Ask a financial question (e.g. 'Which vendor received the highest payout last quarter?')..."
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none"
-          />
-
-          <button
-            type="submit"
-            disabled={!input.trim() || loading}
-            className="p-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white shadow-md transition-all shrink-0"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </form>
-      </footer>
-
-      {/* Benchmark Modal */}
-      <ModelBenchmarkModal
-        isOpen={isBenchmarkOpen}
-        onClose={() => setIsBenchmarkOpen(false)}
-      />
     </div>
   );
 };
